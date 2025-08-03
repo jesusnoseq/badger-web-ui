@@ -1,8 +1,12 @@
 # Badger Database Web UI
 
->A modern web interface for managing Badger key-value databases, built with Go, HTMX, and Tailwind CSS.
+>A web interface for managing Badger key-value databases, built with Go, mux, HTMX, and Tailwind.
 
 ---
+> [!NOTE]
+> A vibe coding project. 
+> This codebase may prioritize rapid prototyping, creativity, and experimentation over strict conventions, exhaustive documentation, or production-grade robustness.
+> Expect some rough edges, unconventional solutions, and evolving features. Use with curiosity and caution!
 
 ## 🚀 Features
 
@@ -98,15 +102,16 @@ curl http://localhost:8080/api/stats
 
 ### Environment Variables
 
-The application supports the following environment variables:
+You can customize the application's behavior using environment variables:
 
-- `BADGER_DB_PATH`: Path to the Badger database directory. Default: `./badger-data`
-- `BADGER_LOG`: Set to `true` to enable Badger logging. Default: `false`.
+### Available Environment Variables
 
-The application uses the following default settings:
-
-- **Port**: 8080
-- **Database Path**: `./badger-data`
+- `BADGER_DB_PATH`: Sets the path to the Badger database directory.
+  - **Default:** `./badger-data`
+- `BADGER_LOG`: Enables Badger logging if set to `true`.
+  - **Default:** `false`
+- `PORT`: Sets the port for the web server.
+  - **Default:** `8080`
 
 ---
 
