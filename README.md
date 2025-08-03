@@ -152,7 +152,7 @@ make build
 
 ## 📁 Project Structure
 
-```
+```text
 ├── main.go              # Main application file
 ├── templates/
 │   └── index.html       # HTML template with HTMX
