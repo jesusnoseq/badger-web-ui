@@ -239,7 +239,7 @@
                                     </div>
                                     <div class="flex space-x-2 ml-4">
                                         <button 
-                                            onclick="editKey('${escapeHtml(kv.key)}', '${escapeHtml(kv.value)}')"
+                                            onclick="editKey('${escape(kv.key)}', '${escape(kv.value)}')"
                                             class="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
                                         >
                                             Edit
@@ -338,8 +338,8 @@
         });
 
         function editKey(key, value) {
-            document.getElementById('edit-key').value = key;
-            document.getElementById('edit-value').value = value;
+            document.getElementById('edit-key').value = unescape(key);
+            document.getElementById('edit-value').value = unescape(value);
             document.getElementById('edit-modal').classList.remove('hidden');
             document.getElementById('edit-modal').classList.add('flex');
         }
