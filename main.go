@@ -94,7 +94,7 @@ func (app *App) indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) listKeysHandler(w http.ResponseWriter, r *http.Request) {
-	limit := 50
+	limit := 1000
 	if l := r.URL.Query().Get("limit"); l != "" {
 		if parsed, err := strconv.Atoi(l); err == nil {
 			limit = parsed
