@@ -2,7 +2,7 @@
 
 A web interface for managing Badger key-value databases, built with Go, badger, mux, HTMX, and Tailwind.
 
-> [!Note] Tested with badger v4.8.0
+> [!NOTE] Tested with badger v4.8.0
 
 ---
 > [!NOTE]
