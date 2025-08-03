@@ -41,72 +41,83 @@
             </div>
         </div>
 
-        <!-- Search and Add Key Section -->
+        <!-- Add New Key Section -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Search -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-3">Search Keys</h3>
-                    <div class="flex">
-                        <input 
-                            type="text" 
-                            id="search-input"
-                            placeholder="Search keys..." 
-                            class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            hx-get="/api/search"
-                            hx-trigger="keyup changed delay:500ms"
-                            hx-target="#key-list"
-                            hx-include="this"
-                            name="q"
-                        >
-                        <button 
-                            class="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600"
-                            hx-get="/api/keys"
-                            hx-target="#key-list"
-                        >
-                            Show All
-                        </button>
-                    </div>
+            <h3 class="text-lg font-semibold mb-4">Add New Key</h3>
+            <form hx-post="/api/keys" hx-target="#add-response" hx-ext="json-enc">
+                <div class="flex flex-col md:flex-row gap-3">
+                    <input 
+                        type="text" 
+                        name="key" 
+                        placeholder="Key" 
+                        required
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                    <input 
+                        type="text" 
+                        name="value" 
+                        placeholder="Value" 
+                        required
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                    <button 
+                        type="submit" 
+                        class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 whitespace-nowrap"
+                    >
+                        Add Key
+                    </button>
                 </div>
-
-                <!-- Add New Key -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-3">Add New Key</h3>
-                    <form hx-post="/api/keys" hx-target="#add-response" hx-ext="json-enc" class="space-y-2">
-                        <div class="flex space-x-2">
-                            <input 
-                                type="text" 
-                                name="key" 
-                                placeholder="Key" 
-                                required
-                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                            >
-                            <input 
-                                type="text" 
-                                name="value" 
-                                placeholder="Value" 
-                                required
-                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                            >
-                        </div>
-                        <button 
-                            type="submit" 
-                            class="w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-                        >
-                            <span class="htmx-indicator">Adding...</span>
-                            Add Key
-                        </button>
-                    </form>
-                    <div id="add-response-container" class="mt-2"></div>
-                </div>
-            </div>
+            </form>
+            <div id="add-response-container" class="mt-3"></div>
         </div>
 
-        <!-- Key-Value List -->
+        <!-- Database Contents with Integrated Search -->
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b border-gray-200">
-                <h2 class="text-xl font-semibold">Database Contents</h2>
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <h2 class="text-xl font-semibold">Database Contents</h2>
+                    
+                    <!-- Integrated Search Bar -->
+                    <div class="flex flex-1 md:max-w-md">
+                        <div class="relative flex-1">
+                            <input 
+                                type="text" 
+                                id="search-input"
+                                placeholder="Search keys..." 
+                                class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                hx-get="/api/search"
+                                hx-trigger="keyup changed delay:300ms, search"
+                                hx-target="#key-list"
+                                hx-include="this"
+                                hx-indicator="#search-spinner"
+                                name="q"
+                            >
+                            <!-- Clear button -->
+                            <button 
+                                id="clear-search-btn"
+                                type="button"
+                                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden z-10 cursor-pointer"
+                                title="Clear search"
+                            >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                            <!-- Search spinner -->
+                            <div id="search-spinner" class="htmx-indicator absolute right-2 top-1/2 transform -translate-y-1/2 z-5">
+                                <svg class="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Status/Results Count -->
+                <div id="search-status" class="mt-3 text-sm text-gray-500"></div>
             </div>
+            
             <div id="key-list" hx-get="/api/keys" hx-trigger="load, refresh" class="divide-y divide-gray-200">
                 <div class="p-6 text-center text-gray-500">
                     <div class="htmx-indicator">Loading keys...</div>
@@ -156,10 +167,63 @@
         document.body.addEventListener('htmx:afterRequest', function(evt) {
             if (evt.detail.target.id === 'key-list' && evt.detail.xhr.status === 200) {
                 const keys = JSON.parse(evt.detail.xhr.responseText);
+                const searchInput = document.getElementById('search-input');
+                const searchStatus = document.getElementById('search-status');
+                const isSearching = searchInput && searchInput.value.trim() !== '';
+                
                 let html = '';
                 
+                // Update search status
+                if (searchStatus) {
+                    if (isSearching) {
+                        const searchTerm = searchInput.value.trim();
+                        const resultCount = keys ? keys.length : 0;
+                        if (resultCount === 0) {
+                            searchStatus.innerHTML = `No keys found matching "${escapeHtml(searchTerm)}"`;
+                            searchStatus.className = 'mt-3 text-sm text-orange-600';
+                        } else {
+                            searchStatus.innerHTML = `Found ${resultCount} key${resultCount !== 1 ? 's' : ''} matching "${escapeHtml(searchTerm)}"`;
+                            searchStatus.className = 'mt-3 text-sm text-blue-600';
+                        }
+                    } else {
+                        const totalCount = keys ? keys.length : 0;
+                        searchStatus.innerHTML = `Showing all ${totalCount} key${totalCount !== 1 ? 's' : ''}`;
+                        searchStatus.className = 'mt-3 text-sm text-gray-500';
+                    }
+                }
+                
                 if (keys && keys.length === 0) {
-                    html = '<div class="p-6 text-center text-gray-500">No keys found</div>';
+                    if (isSearching) {
+                        html = `
+                            <div class="p-8 text-center text-gray-500">
+                                <div class="mb-2">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <p class="text-lg">No keys found</p>
+                                <p class="text-sm mb-3">Try a different search term or clear the search to see all keys</p>
+                                <button 
+                                    onclick="clearSearch()" 
+                                    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+                                >
+                                    Clear Search
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        html = `
+                            <div class="p-8 text-center text-gray-500">
+                                <div class="mb-2">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2M4 13h2m0 0V9a2 2 0 012-2h2m5 0h2a2 2 0 012 2v4M9 9h6" />
+                                    </svg>
+                                </div>
+                                <p class="text-lg">Database is empty</p>
+                                <p class="text-sm">Add your first key-value pair using the form above</p>
+                            </div>
+                        `;
+                    }
                 } else {
                     keys.forEach((kv, index) => {
                         const keyId = `key-item-${btoa(kv.key).replace(/[+/=]/g, '')}`; // Create safe ID from key
@@ -199,6 +263,9 @@
                 evt.detail.target.innerHTML = html;
                 // Process the newly added HTML so HTMX attributes work
                 htmx.process(evt.detail.target);
+                
+                // Update clear button visibility after search results are loaded
+                updateClearButtonVisibility();
             }
         });
 
@@ -317,6 +384,75 @@
             div.textContent = text;
             return div.innerHTML;
         }
+
+        function clearSearch() {
+            const searchInput = document.getElementById('search-input');
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.focus();
+                if (clearBtn) {
+                    clearBtn.classList.add('hidden');
+                }
+                // Trigger the search to show all keys
+                htmx.trigger(searchInput, 'search');
+            }
+        }
+
+        // Handle search input changes for clear button visibility
+        function updateClearButtonVisibility() {
+            const searchInput = document.getElementById('search-input');
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (searchInput && clearBtn) {
+                if (searchInput.value.trim() !== '') {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        // Add event listeners for search input
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const clearBtn = document.getElementById('clear-search-btn');
+            
+            if (searchInput) {
+                // Update clear button visibility on input
+                searchInput.addEventListener('input', updateClearButtonVisibility);
+                searchInput.addEventListener('keyup', updateClearButtonVisibility);
+                
+                // Handle Enter key to trigger immediate search
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        htmx.trigger(searchInput, 'search');
+                    }
+                });
+                
+                // Set initial clear button visibility
+                updateClearButtonVisibility();
+            }
+            
+            // Add click event listener for clear button
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    clearSearch();
+                });
+            }
+        });
+
+        // Add keyboard shortcut for clearing search
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const searchInput = document.getElementById('search-input');
+                if (searchInput && searchInput.value.trim() !== '') {
+                    clearSearch();
+                }
+            }
+        });
 
         // Show 'Response:' only when add-response has content
         const addResponseDiv = document.createElement('div');
