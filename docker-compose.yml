@@ -8,4 +8,5 @@ services:
     environment:
       - BADGER_DB_PATH=/root/badger-data
       - BADGER_LOG=false
+      - PORT=8080
     restart: unless-stopped

@@ -31,13 +31,18 @@ type Stats struct {
 	DatabaseSize int64 `json:"database_size"`
 }
 
-func main() {
-	dbPath := os.Getenv("BADGER_DB_PATH")
-	if dbPath == "" {
-		dbPath = "./badger-data"
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return defaultValue
 	}
+	return value
+}
+
+func main() {
+	dbPath := getEnv("BADGER_DB_PATH", "./badger-data")
 	opts := badger.DefaultOptions(dbPath)
-	if os.Getenv("BADGER_LOG") != "true" {
+	if getEnv("BADGER_LOG", "false") != "true" {
 		opts.Logger = nil // Disable logging for cleaner output
 	}
 
@@ -76,8 +81,9 @@ func main() {
 	r.HandleFunc("/api/stats", app.statsHandler).Methods("GET")
 	r.HandleFunc("/api/search", app.searchKeysHandler).Methods("GET")
 
-	fmt.Println("Server starting on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	port := getEnv("PORT", "8080")
+	fmt.Printf("Server starting on http://localhost:%s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
 
 func (app *App) indexHandler(w http.ResponseWriter, r *http.Request) {

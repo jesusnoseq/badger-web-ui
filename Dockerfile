@@ -17,5 +17,7 @@ COPY --from=builder /app/templates ./templates/
 ENV BADGER_DB_PATH="/root/badger-data"
 ENV BADGER_LOG="false"
 
-EXPOSE 8080
+ARG PORT=8080
+ENV PORT=$PORT
+EXPOSE $PORT
 CMD ["./badger-web-ui"]
