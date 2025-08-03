@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badger Database Manager</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10/dist/ext/json-enc.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/debug.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+          htmx.logAll();
+    </script>
+    <style>
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 500ms ease-in;
+        }
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+        .htmx-request.htmx-indicator {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen" hx-ext="debug">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Badger Database Manager</h1>
+                    <p class="text-gray-600 mt-2">Fast key-value database management interface</p>
+                </div>
+                <div class="text-right">
+                    <div id="stats" hx-get="/api/stats" hx-trigger="load, every 10s" class="text-sm text-gray-500">
+                        <div class="htmx-indicator">Loading stats...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Add Key Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Search -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Search Keys</h3>
+                    <div class="flex">
+                        <input 
+                            type="text" 
+                            id="search-input"
+                            placeholder="Search keys..." 
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            hx-get="/api/search"
+                            hx-trigger="keyup changed delay:500ms"
+                            hx-target="#key-list"
+                            hx-include="this"
+                            name="q"
+                        >
+                        <button 
+                            class="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600"
+                            hx-get="/api/keys"
+                            hx-target="#key-list"
+                        >
+                            Show All
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add New Key -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Add New Key</h3>
+                    <form hx-post="/api/keys" hx-target="#add-response" hx-ext="json-enc" class="space-y-2">
+                        <div class="flex space-x-2">
+                            <input 
+                                type="text" 
+                                name="key" 
+                                placeholder="Key" 
+                                required
+                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                            >
+                            <input 
+                                type="text" 
+                                name="value" 
+                                placeholder="Value" 
+                                required
+                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                            >
+                        </div>
+                        <button 
+                            type="submit" 
+                            class="w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                        >
+                            <span class="htmx-indicator">Adding...</span>
+                            Add Key
+                        </button>
+                    </form>
+                    <div id="add-response-container" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key-Value List -->
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold">Database Contents</h2>
+            </div>
+            <div id="key-list" hx-get="/api/keys" hx-trigger="load, refresh" class="divide-y divide-gray-200">
+                <div class="p-6 text-center text-gray-500">
+                    <div class="htmx-indicator">Loading keys...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
+            <h3 class="text-lg font-semibold mb-4">Edit Key</h3>
+            <form id="edit-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Key</label>
+                    <input type="text" id="edit-key" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Value</label>
+                    <textarea id="edit-value" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                        Update
+                    </button>
+                    <button type="button" onclick="closeEditModal()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Handle stats response
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            if (evt.detail.target.id === 'stats' && evt.detail.xhr.status === 200) {
+                const stats = JSON.parse(evt.detail.xhr.responseText);
+                evt.detail.target.innerHTML = `
+                    <div>Keys: ${stats.num_keys}</div>
+                    <div>Size: ${formatBytes(stats.database_size)}</div>
+                `;
+            }
+        });
+
+        // Handle key list response
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            if (evt.detail.target.id === 'key-list' && evt.detail.xhr.status === 200) {
+                const keys = JSON.parse(evt.detail.xhr.responseText);
+                let html = '';
+                
+                if (keys && keys.length === 0) {
+                    html = '<div class="p-6 text-center text-gray-500">No keys found</div>';
+                } else {
+                    keys.forEach((kv, index) => {
+                        const keyId = `key-item-${btoa(kv.key).replace(/[+/=]/g, '')}`; // Create safe ID from key
+                        html += `
+                            <div id="${keyId}" class="p-4 hover:bg-gray-50" data-key="${escapeHtml(kv.key)}">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center space-x-3">
+                                            <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">${escapeHtml(kv.key)}</span>
+                                            <span class="text-gray-500 text-xs">${new Date(kv.created_at).toLocaleString()}</span>
+                                        </div>
+                                        <div class="mt-2 text-sm text-gray-600 break-all">${escapeHtml(kv.value)}</div>
+                                    </div>
+                                    <div class="flex space-x-2 ml-4">
+                                        <button 
+                                            onclick="editKey('${escapeHtml(kv.key)}', '${escapeHtml(kv.value)}')"
+                                            class="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button 
+                                            hx-delete="/api/keys/${encodeURIComponent(kv.key)}"
+                                            hx-target="#${keyId}"
+                                            hx-swap="delete"
+                                            hx-confirm="Are you sure you want to delete this key?"
+                                            class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                evt.detail.target.innerHTML = html;
+                // Process the newly added HTML so HTMX attributes work
+                htmx.process(evt.detail.target);
+            }
+        });
+
+        // Handle form submissions
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            if (evt.detail.xhr.status === 200 && evt.detail.requestConfig.verb === 'post') {
+                // Clear form after successful submission
+                const form = evt.detail.elt;
+                if (form.tagName === 'FORM') {
+                    form.reset();
+                }
+                // Refresh the key list
+                htmx.trigger('#key-list', 'refresh');
+                
+                // Show success message
+                const successDiv = document.createElement('div');
+                successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+                successDiv.textContent = 'Key added successfully';
+                document.body.appendChild(successDiv);
+                setTimeout(() => successDiv.remove(), 3000);
+            }
+        });
+
+        // Handle delete operations
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {
+            if (evt.detail.requestConfig.verb === 'delete') {
+                console.log('Delete request starting for:', evt.detail.requestConfig.path);
+                console.log('Request details:', evt.detail);
+            }
+        });
+
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            if (evt.detail.requestConfig.verb === 'delete') {
+                console.log('Delete request completed');
+                console.log('Status:', evt.detail.xhr.status);
+                console.log('Response:', evt.detail.xhr.responseText);
+                
+                if (evt.detail.xhr.status === 204) {
+                    console.log('Key deleted successfully');
+                    // Refresh the key list
+                    htmx.trigger('#key-list', 'refresh');
+                    // Show success message
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+                    successDiv.textContent = 'Key deleted successfully';
+                    document.body.appendChild(successDiv);
+                    setTimeout(() => successDiv.remove(), 3000);
+                } else {
+                    console.error('Delete failed with status:', evt.detail.xhr.status);
+                }
+            }
+        });
+
+        // Handle delete errors
+        document.body.addEventListener('htmx:responseError', function(evt) {
+            if (evt.detail.requestConfig.verb === 'delete') {
+                console.error('Delete request error:', evt.detail);
+                console.error('Error status:', evt.detail.xhr.status);
+                console.error('Error response:', evt.detail.xhr.responseText);
+                alert('Failed to delete key: ' + (evt.detail.xhr.responseText || 'Unknown error'));
+            }
+        });
+
+        // Handle request errors (network issues, etc.)
+        document.body.addEventListener('htmx:sendError', function(evt) {
+            if (evt.detail.requestConfig.verb === 'delete') {
+                console.error('Delete request send error:', evt.detail);
+                alert('Network error while deleting key');
+            }
+        });
+
+        function editKey(key, value) {
+            document.getElementById('edit-key').value = key;
+            document.getElementById('edit-value').value = value;
+            document.getElementById('edit-modal').classList.remove('hidden');
+            document.getElementById('edit-modal').classList.add('flex');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+            document.getElementById('edit-modal').classList.remove('flex');
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const key = document.getElementById('edit-key').value;
+            const value = document.getElementById('edit-value').value;
+            
+            fetch(`/api/keys/${encodeURIComponent(key)}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ value: value })
+            })
+            .then(response => {
+                if (response.ok) {
+                    closeEditModal();
+                    htmx.trigger('#key-list', 'refresh');
+                } else {
+                    alert('Failed to update key');
+                }
+            });
+        });
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Show 'Response:' only when add-response has content
+        const addResponseDiv = document.createElement('div');
+        addResponseDiv.id = 'add-response';
+        document.getElementById('add-response-container').appendChild(addResponseDiv);
+
+        const observer = new MutationObserver(function(mutations) {
+            const response = addResponseDiv.innerHTML.trim();
+            const container = document.getElementById('add-response-container');
+            container.innerHTML = '';
+            if (response) {
+                container.innerHTML = `<div class="bg-blue-50 border border-blue-200 rounded px-3 py-2 text-blue-700 shadow mb-2"><span class="font-semibold">Response:</span> <span id="add-response">${response}</span></div>`;
+                // If response is not empty, update key list
+                htmx.trigger('#key-list', 'refresh');
+            } else {
+                container.innerHTML = '<div id="add-response"></div>';
+            }
+        });
+        observer.observe(addResponseDiv, { childList: true, subtree: true });
+    </script>
+</body>
+</html>

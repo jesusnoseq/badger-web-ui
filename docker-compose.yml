@@ -1,0 +1,11 @@
+services:
+  badger-web-ui:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./badger-data:/root/badger-data
+    environment:
+      - BADGER_DB_PATH=/root/badger-data
+      - BADGER_LOG=false
+    restart: unless-stopped
