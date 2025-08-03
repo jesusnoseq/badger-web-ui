@@ -2,7 +2,8 @@
 
 A web interface for managing Badger key-value databases, built with Go, badger, mux, HTMX, and Tailwind.
 
-> [!NOTE] Develop with [Badger](https://github.com/hypermodeinc/badger) v4.8.0
+> [!NOTE]
+> Develop with [Badger](https://github.com/hypermodeinc/badger) v4.8.0
 
 ---
 > [!WARNING]
