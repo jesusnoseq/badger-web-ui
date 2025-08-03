@@ -1,10 +1,12 @@
 # Badger Database Web UI
 
->A web interface for managing Badger key-value databases, built with Go, mux, HTMX, and Tailwind.
+A web interface for managing Badger key-value databases, built with Go, badger, mux, HTMX, and Tailwind.
+
+> [!Note] Tested with badger v4.8.0
 
 ---
 > [!NOTE]
-> A vibe coding project. 
+> A vibe coding project.
 > This codebase may prioritize rapid prototyping, creativity, and experimentation over strict conventions, exhaustive documentation, or production-grade robustness.
 > Expect some rough edges, unconventional solutions, and evolving features. Use with curiosity and caution!
 
@@ -31,26 +33,19 @@
 Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/jesusnoseq/badger-web-ui
 cd badger-web-ui
 ```
 
 Install dependencies:
 
 ```bash
-go mod tidy
+make deps
 ```
 
 ### Run the application
 
 ```bash
-go run main.go
-```
-
-Or use Makefile shortcuts:
-
-```bash
-make deps
 make run
 ```
 
@@ -137,7 +132,7 @@ docker-compose up -d
 Install air for auto-reload (optional):
 
 ```bash
-go install github.com/cosmtrek/air@latest
+make tools
 ```
 
 Run with auto-reload:
@@ -152,16 +147,11 @@ Build binary:
 make build
 ```
 
-Build Docker image:
-
-```bash
-make docker-build
-```
-
 ---
 
 ## 📁 Project Structure
 
+```
 ├── main.go              # Main application file
 ├── templates/
 │   └── index.html       # HTML template with HTMX
@@ -170,15 +160,7 @@ make docker-build
 ├── Dockerfile           # Docker configuration
 ├── Makefile             # Build automation
 └── README.md            # This file
-
----
-
-## 🚦 Performance
-
-- Badger is optimized for SSD storage
-- The web interface limits key listings to prevent memory issues
-- Search is performed in-memory for fast results
-- Statistics are cached and updated every 5 seconds
+```
 
 ---
 
@@ -194,7 +176,7 @@ make docker-build
 
 ## 📜 License
 
-This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
@@ -203,4 +185,3 @@ This project is licensed under the Apache 2.0 License - see the LICENSE file for
 - [Badger](https://github.com/dgraph-io/badger) - Fast key-value DB in Go
 - [HTMX](https://htmx.org/) - High power tools for HTML
 - [GorillaMux](https://github.com/gorilla/mux) - HTTP router and URL matcher
-
