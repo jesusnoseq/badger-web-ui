@@ -2,13 +2,18 @@
 
 A web interface for managing Badger key-value databases, built with Go, badger, mux, HTMX, and Tailwind.
 
-> [!NOTE] Tested with badger v4.8.0
+> [!NOTE] Develop with [Badger](https://github.com/hypermodeinc/badger) v4.8.0
 
 ---
-> [!NOTE]
-> A vibe coding project.
+> [!WARNING]
+> This is a casual vibe coding project.
 > This codebase may prioritize rapid prototyping, creativity, and experimentation over strict conventions, exhaustive documentation, or production-grade robustness.
 > Expect some rough edges, unconventional solutions, and evolving features. Use with curiosity and caution!
+
+---
+
+> [!TIP]
+> This is a side project of a side project. That's the reason why I didn't put much effort into this.
 
 ## 🚀 Features
 
@@ -21,7 +26,7 @@ A web interface for managing Badger key-value databases, built with Go, badger, 
 
 ---
 
-## 🏁 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -95,11 +100,7 @@ curl http://localhost:8080/api/stats
 
 ## ⚙️ Configuration
 
-### Environment Variables
-
 You can customize the application's behavior using environment variables:
-
-### Available Environment Variables
 
 - `BADGER_DB_PATH`: Sets the path to the Badger database directory.
   - **Default:** `./badger-data`
@@ -182,6 +183,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🙏 Acknowledgments
 
-- [Badger](https://github.com/dgraph-io/badger) - Fast key-value DB in Go
-- [HTMX](https://htmx.org/) - High power tools for HTML
-- [GorillaMux](https://github.com/gorilla/mux) - HTTP router and URL matcher
+- [Badger](https://github.com/dgraph-io/badger) - Fast key-value database in Go
+- [HTMX](https://htmx.org/) - High-power tools for HTML
+- [Gorilla Mux](https://github.com/gorilla/mux) - HTTP router and URL matcher
